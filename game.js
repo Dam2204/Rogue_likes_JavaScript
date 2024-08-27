@@ -1,15 +1,16 @@
 import chalk from 'chalk';
 import readlineSync from 'readline-sync';
-import figlet from 'figlet';
 import { gameover } from './server.js';
 import { handleUserInput2 } from './server.js';
+import { gameclear } from './server.js';
+import { handleUserInput3 } from './server.js';
 
 // 플레이어 세팅 //
 class Player {
   constructor(player) {
     this.hp = 100;
-    this.minPower = 10;
-    this.maxPower = 15;
+    this.minPower = 15;
+    this.maxPower = 20;
   }
 
   normal_ATK(monster) {
@@ -20,8 +21,8 @@ class Player {
 
   counter_ATK(monster) {
     let damage = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
-    monster.hp -= damage * 3;
-    return damage * 3;
+    monster.hp -= damage * 2.5;
+    return damage * 2.5;
   }
 
   ultimate_ATK(monster) {
@@ -33,17 +34,17 @@ class Player {
   expUp_min(player) {
     let battleData_min = Math.floor(Math.random() * (6 - 3 + 1)) + 3;
     player.minPower += battleData_min;
-    return (player.minPower += battleData_min);
+    return battleData_min;
   }
 
   expUp_max(player) {
     let battleData_max = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
     player.maxPower += battleData_max;
-    return (player.maxPower += battleData_max);
+    return battleData_max;
   }
 
   repair(player) {
-    let heal = Math.floor(Math.random() * (50 - 30 + 1)) + 30;
+    let heal = Math.floor(Math.random() * (70 - 50 + 1)) + 50;
     player.hp += heal;
     return heal;
   }
@@ -52,7 +53,7 @@ class Player {
 // 몬스터 세팅 //
 class Monster {
   constructor(stage) {
-    this.hp = 60 + stage * (Math.floor(Math.random() * (50 - 20 + 1)) + 20);
+    this.hp = 60 + stage * (Math.floor(Math.random() * (40 - 20 + 1)) + 20);
     this.minPower = 3 + stage * (Math.floor(Math.random() * (6 - 3 + 1)) + 3);
     this.maxPower = 6 + stage * (Math.floor(Math.random() * (10 - 5 + 1)) + 5);
   }
@@ -105,7 +106,7 @@ const battle = async (stage, player, monster) => {
 
     console.log(
       chalk.green(
-        `\n1. 물리 공격(85%) 2. 전류 방출(40%) 3. 제 ${stage} 구역 방어 시스템 복구(10%)`,
+        `\n1. 물리 공격(85%) 2. 전류 방출(45%) 3. 제 ${stage} 구역 방어 시스템 복구(20%)`,
       ),
     );
 
@@ -134,7 +135,7 @@ const battle = async (stage, player, monster) => {
           break;
         }
       case '2':
-        if (rand_0_100(1) > 60) {
+        if (rand_0_100(1) > 55) {
           const counter = player.counter_ATK(monster);
           logs.push(chalk.blueBright('[ EVE의 전류 방출! ]'));
           logs.push(chalk.blueBright(`▶ 성공: 오염체가 감전되어 일시적 행동 불가 상태가 되었다!`));
@@ -151,7 +152,7 @@ const battle = async (stage, player, monster) => {
           break;
         }
       case '3':
-        if (rand_0_100(1) > 90) {
+        if (rand_0_100(1) > 80) {
           const ultimate = player.ultimate_ATK(monster);
           logs.push(chalk.blueBright('[ EVE의 방어 시스템 복구 시도! ]'));
           logs.push(chalk.yellow(`▶ 성공: 오염체에게 ${ultimate}의 대미지를 입혔다.`));
@@ -167,46 +168,11 @@ const battle = async (stage, player, monster) => {
         }
     }
   }
-
-  if (player.hp <= 0) {
-    gameover();
-    handleUserInput2();
-  } else if (monster.hp <= 0) {
-    console.clear();
-    function delay(ms = 1000) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
-    async function delayTest() {}
-    console.log(chalk.magentaBright(`===================================`));
-    console.log(chalk.magentaBright.bold(`제 ${stage} 구역의 오염체를 섬멸했습니다.`));
-    console.log(chalk.magentaBright(`===================================`));
-    console.log(chalk.magentaBright(` `));
-
-    await delay(2000);
-    const expUp_1 = player.expUp_min(player);
-    const expUp_2 = player.expUp_max(player);
-    console.log(
-      chalk.magentaBright(
-        `[ 전투 데이터 분석 완료 ] 오염체에게 ${expUp_1} ~ ${expUp_2}의 대미지를 입힐 수 있게 되었습니다.`,
-      ),
-    );
-    console.log(chalk.magentaBright(` `));
-    await delay(2000);
-    const healUp = player.repair(player);
-    console.log(
-      chalk.magentaBright(
-        `[ 수리 완료 ] 제 ${stage} 구역의 시설 부품을 사용하여 ${healUp}의 내구도를 회복했습니다.`,
-      ),
-    );
-    console.log(chalk.magentaBright(` `));
-    console.log(chalk.hidden());
-    await delay(2000);
-    console.log(chalk.magentaBright.bold(`5초 뒤 다음 구역으로 이동합니다.`));
-    await delay(5000);
-    console.log();
-  }
 };
 
+function delay(ms = 1000) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 export async function startGame() {
   console.clear();
   const player = new Player();
@@ -217,7 +183,45 @@ export async function startGame() {
 
     await battle(stage, player, monster);
 
-    // 스테이지 클리어 및 게임 종료 조건
+    if (player.hp <= 0) {
+      gameover();
+      handleUserInput2();
+      break;
+    } else if (monster.hp <= 0 && stage < 10) {
+      console.clear();
+
+      console.log(chalk.magentaBright(`===================================`));
+      console.log(chalk.magentaBright.bold(`제 ${stage} 구역의 오염체를 섬멸했습니다.`));
+      console.log(chalk.magentaBright(`===================================`));
+      console.log(chalk.magentaBright(` `));
+
+      await delay(2000);
+      const expUp_1 = player.expUp_min(player);
+      const expUp_2 = player.expUp_max(player);
+      console.log(
+        chalk.magentaBright(
+          `[ 전투 데이터 분석 완료 ] 오염체에 대한 최소 대미지가 ${expUp_1}, 최대 대미지가 ${expUp_2} 보정됩니다.`,
+        ),
+      );
+      console.log(chalk.magentaBright(` `));
+      await delay(2000);
+      const healUp = player.repair(player);
+      console.log(
+        chalk.magentaBright(
+          `[ 수리 완료 ] 제 ${stage} 구역의 시설 부품을 사용하여 ${healUp}의 내구도를 회복했습니다.`,
+        ),
+      );
+      console.log(chalk.magentaBright(` `));
+      console.log(chalk.hidden());
+      await delay(2000);
+      console.log(chalk.magentaBright.bold(`5초 뒤 다음 구역으로 이동합니다.`));
+      await delay(5000);
+      console.log();
+    } else {
+      // 게임을 클리어 할 경우 else 처리됨
+      gameclear();
+      handleUserInput3();
+    }
 
     stage++;
   }

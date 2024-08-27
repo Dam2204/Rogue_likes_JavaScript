@@ -9,7 +9,7 @@ function displayLobby() {
 
   // 타이틀 텍스트
   console.log(
-    chalk.cyan(
+    chalk.magenta(
       figlet.textSync('Planet E-83', {
         font: 'Standard',
         horizontalLayout: 'default',
@@ -19,7 +19,7 @@ function displayLobby() {
   );
 
   // 상단 경계선
-  const line = chalk.magentaBright('='.repeat(50));
+  const line = chalk.magentaBright('='.repeat(55));
   console.log(line);
 
   // 게임 이름
@@ -63,10 +63,10 @@ function handleUserInput() {
       handleUserInput();
       break;
     case '4':
-      console.log(chalk.red('WN-2sT 광산을 포기합니다.'));
+      console.log(chalk.red.bold('WN-2sT 광산을 포기합니다.'));
       // 게임 종료 로직을 구현
       process.exit(0); // 게임 종료
-      break;
+
     default:
       console.log(chalk.red('올바른 선택을 하세요.'));
       handleUserInput(); // 유효하지 않은 입력일 경우 다시 입력 받음
@@ -81,6 +81,10 @@ function start() {
 
 // 게임 실행
 start();
+
+function delay(ms = 1000) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 // 게임 오버 함수 //
 export async function gameover() {
@@ -120,36 +124,26 @@ export async function handleUserInput2() {
 
   switch (choice) {
     case '1':
-      console.log(chalk.green('정화 작업을 시작합니다.'));
-      console.log(
-        chalk.cyan(
-          figlet.textSync('Connecting . . .', {
-            font: 'Standard',
-            horizontalLayout: 'default',
-            verticalLayout: 'default',
-          }),
-        ),
-      );
       startGame(); //새로운 게임 시작
       break;
     case '2':
       console.log(chalk.red('WN-2sT 광산을 포기합니다.'));
       process.exit(0); // 게임 종료
-      break;
+
     default:
       console.log(chalk.red('올바른 선택을 하세요.'));
       handleUserInput2(); // 유효하지 않은 입력일 경우 다시 입력 받음
   }
 }
 
-// 게임 클리어 함수
-function gameclear() {
+// 게임 클리어 함수 //
+export async function gameclear() {
   console.clear();
 
   // 타이틀 텍스트
   console.log(
-    chalk.cyan(
-      figlet.textSync('Complete', {
+    chalk.green(
+      figlet.textSync(' Complete ', {
         font: 'Standard',
         horizontalLayout: 'default',
         verticalLayout: 'default',
@@ -158,32 +152,34 @@ function gameclear() {
   );
 
   // 상단 경계선
-  const line = chalk.magentaBright('='.repeat(50));
+  const line = chalk.gray('='.repeat(50));
   console.log(line);
 
   // 메인 텍스트
-  console.log(chalk.red.bold('정화 작업이 완료되었습니다.'));
+  console.log(chalk.green.bold('정화 작업이 완료되었습니다.'));
 
   // 설명 텍스트
   console.log(chalk.gray('행성 관리 프로그램을 종료하시겠습니까?'));
   console.log();
 
   // 옵션들
-  console.log(chalk.blue('1.') + chalk.white(' 종료하기'));
+  console.log(chalk.blue.bold('1.') + chalk.white.bold(' 종료하기'));
+  console.log(chalk.blue('2.') + chalk.white(' 오염도 확인하기'));
+}
 
-  // 유저 입력을 받아 처리하는 함수
-  function handleUserInput3() {
-    const choice = readlineSync.question('입력: ');
+// 게임 클리어시, 유저 입력을 받아 처리하는 함수
+export async function handleUserInput3() {
+  const choice = readlineSync.question('입력: ');
 
-    switch (choice) {
-      case '1':
-        console.log(chalk.red('행성 관리 프로그램을 종료합니다.'));
-        // 게임 종료 로직을 구현
-        process.exit(0); // 게임 종료
-        break;
-      default:
-        console.log(chalk.red('올바른 선택을 하세요.'));
-        handleUserInput3(); // 유효하지 않은 입력일 경우 다시 입력 받음
-    }
+  switch (choice) {
+    case '1':
+      console.log(chalk.green('프로그램을 종료합니다.'));
+      process.exit(0); // 게임 종료
+    case '2':
+      console.log(chalk.white('0% ... 정화 작업이 완료되었습니다.'));
+      handleUserInput3();
+    default:
+      console.log(chalk.red('올바른 선택을 하세요.'));
+      handleUserInput3(); // 유효하지 않은 입력일 경우 다시 입력 받음
   }
 }
