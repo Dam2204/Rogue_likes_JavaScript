@@ -20,8 +20,8 @@ class Player {
 
   counter_ATK(monster) {
     let damage = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
-    monster.hp -= damage * 5;
-    return damage * 5;
+    monster.hp -= damage * 3;
+    return damage * 3;
   }
 
   ultimate_ATK(monster) {
@@ -51,10 +51,10 @@ class Player {
 
 // 몬스터 세팅 //
 class Monster {
-  constructor() {
-    this.hp = 70;
-    this.minPower = 3;
-    this.maxPower = 6;
+  constructor(stage) {
+    this.hp = 60 + stage * (Math.floor(Math.random() * (50 - 20 + 1)) + 20);
+    this.minPower = 3 + stage * (Math.floor(Math.random() * (6 - 3 + 1)) + 3);
+    this.maxPower = 6 + stage * (Math.floor(Math.random() * (10 - 5 + 1)) + 5);
   }
 
   attack(player) {
@@ -62,32 +62,10 @@ class Monster {
     player.hp -= damage;
     return damage;
   }
-
-  expUp_min(monster) {
-    let battleData_min = 3;
-    monster.minPower += battleData_min;
-    return (monster.minPower += battleData_min);
-  }
-
-  expUp_max(monster) {
-    let battleData_max = 6;
-    monster.maxPower += battleData_max;
-    return (monster.maxPower += battleData_max);
-  }
-
-  hpUp(monster) {
-    let heal = Math.floor(Math.random() * (50 - 20 + 1)) + 20;
-    monster.hp += heal;
-    return heal;
-  }
 }
 
 function rand_0_100() {
   return Math.floor(Math.random() * 101);
-}
-
-function diceroll(minPower, maxPower) {
-  return Math.floor(Math.randome() * (maxPower * minPower + 1));
 }
 
 // 게임 스테이터스 세팅 //
@@ -127,7 +105,7 @@ const battle = async (stage, player, monster) => {
 
     console.log(
       chalk.green(
-        `\n1. 물리 공격(85%) 2. 전류 방출(30%) 3. 제 ${stage} 구역 방어 시스템 복구(10%)`,
+        `\n1. 물리 공격(85%) 2. 전류 방출(40%) 3. 제 ${stage} 구역 방어 시스템 복구(10%)`,
       ),
     );
 
@@ -156,7 +134,7 @@ const battle = async (stage, player, monster) => {
           break;
         }
       case '2':
-        if (rand_0_100(1) > 70) {
+        if (rand_0_100(1) > 60) {
           const counter = player.counter_ATK(monster);
           logs.push(chalk.blueBright('[ EVE의 전류 방출! ]'));
           logs.push(chalk.blueBright(`▶ 성공: 오염체가 감전되어 일시적 행동 불가 상태가 되었다!`));
@@ -236,9 +214,6 @@ export async function startGame() {
 
   while (stage <= 10) {
     const monster = new Monster(stage);
-    const monsterMinup = monster.expUp_min(monster);
-    const monsterMaxup = monster.expUp_max(monster);
-    const monsterHpup = monster.hpUp(monster);
 
     await battle(stage, player, monster);
 
