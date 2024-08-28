@@ -44,7 +44,7 @@ class Player {
   }
 
   repair(player) {
-    let heal = Math.floor(Math.random() * (70 - 50 + 1)) + 50;
+    let heal = Math.floor(Math.random() * (80 - 50 + 1)) + 50;
     player.hp += heal;
     return heal;
   }
@@ -195,7 +195,7 @@ export async function startGame() {
       console.log(chalk.magentaBright(`===================================`));
       console.log(chalk.magentaBright(` `));
 
-      await delay(2000);
+      await delay(1500);
       const expUp_1 = player.expUp_min(player);
       const expUp_2 = player.expUp_max(player);
       console.log(
@@ -204,7 +204,7 @@ export async function startGame() {
         ),
       );
       console.log(chalk.magentaBright(` `));
-      await delay(2000);
+      await delay(1500);
       const healUp = player.repair(player);
       console.log(
         chalk.magentaBright(
@@ -213,9 +213,9 @@ export async function startGame() {
       );
       console.log(chalk.magentaBright(` `));
       console.log(chalk.hidden());
-      await delay(2000);
-      console.log(chalk.magentaBright.bold(`5초 뒤 다음 구역으로 이동합니다.`));
-      await delay(5000);
+      await delay(1500);
+      console.log(chalk.magentaBright.bold(`3초 뒤 다음 구역으로 이동합니다.`));
+      await delay(3000);
       console.log();
     } else {
       // 게임을 클리어 할 경우 else 처리됨
